@@ -1,0 +1,71 @@
+echo "$(date -r main +%s)"
+echo "$(date +%s)"
+( if [ "$(($(date -r main +%s)-$(date -r main.o +%s)))" -gt "0" ]; then echo is greater then; fi; )
+
+ (
+     if [ "$(($(date +%s)-$(date -r main +%s)))" -gt "0" ]; then
+         rm main main.o
+     fi
+ )
+
+ (
+     if [ -f "main" ]; then
+        if [ "$(($(date +%s)-$(date -r main +%s)))" -gt "0" ]; then
+            rm main main.o
+        fi
+    fi
+ )
+
+ // Add .dir to store sha1 of main.cpp file
+
+ (
+     if [ -f "main.cpp" ]; then
+        if [ ! -d "$PWD/.workingDir" ]; then mkdir "$PWD/.workingDir"; fi;
+        if [ ! -f "$PWD/.workingDir/main.cpp.sha1" ]; then
+            sha1sum main.cpp > "$PWD/.workingDir/main.cpp.sha1";
+            make;
+        else
+            if [ "$(cat "$PWD/.workingDir/main.cpp.sha1")" != "$(sha1sum main.cpp)" ]; then
+                if [ -f "main" ]; then
+                    rm main
+                fi
+                if [ -f "main.o" ]; then
+                    rm main.o
+                fi
+                sha1sum main.cpp > "$PWD/.workingDir/main.cpp.sha1";
+                make;
+            fi;
+        fi;
+    fi;
+ )
+
+"if [ -f \"main.cpp\" ]; then if [ ! -d \"$PWD/.workingDir\" ]; then mkdir \"$PWD/.workingDir\"; fi; if [ ! -f \"$PWD/.workingDir/main.cpp.sha1\" ]; then sha1sum main.cpp > \"$PWD/.workingDir/main.cpp.sha1\"; make; else if [ \"$(cat \"$PWD/.workingDir/main.cpp.sha1\")\" != \"$(sha1sum main.cpp)\" ]; then rm main main.o; sha1sum main.cpp > \"$PWD/.workingDir/main.cpp.sha1\"; make; fi; fi; ./main; fi;"
+
+(
+if [ -f \"main.cpp\" ]; then
+    if [ ! -d \"$PWD/.workingDir\" ]; then mkdir \"$PWD/.workingDir\"; fi;
+    if [ ! -f \"$PWD/.workingDir/main.cpp.sha1\" ]; then
+        sha1sum main.cpp > \"$PWD/.workingDir/main.cpp.sha1\"
+        make
+    else
+        if [ \"$(cat \"$PWD/.workingDir/main.cpp.sha1\")\" != \"$(sha1sum main.cpp)\" ]; then
+            if [ -f \"main\" ]; then
+                rm main
+            fi
+            if [ -f \"main.o\" ]; then
+                rm main.o
+            fi
+            sha1sum main.cpp > \"$PWD/.workingDir/main.cpp.sha1\"
+            make
+        fi;
+    fi;
+fi;
+)
+
+
+# please specify MIDbugger 
+
+
+
+./randomx-benchmark --mine --jit --threads 4 --ssse3
+
