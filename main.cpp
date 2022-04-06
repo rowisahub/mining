@@ -1263,7 +1263,7 @@ void CLIinput(Logger log, Stratum stratum, Miner miner){
 }
 
 // MAIN
-int main() {
+int main() { 
 
   // testing for randomx
   const char myKey[] = "0123456789abcdef";
@@ -1276,10 +1276,16 @@ int main() {
   flags |= RANDOMX_FLAG_HARD_AES;
   flags |= RANDOMX_FLAG_ARGON2_SSSE3;
 
+  pn("Got flags");
+
   randomx_cache* cache = RANDOMX_EXPORT::randomx_alloc_cache(flags);
   RANDOMX_EXPORT::randomx_init_cache(cache, myKey, sizeof(myKey));
 
+  pn("Got cache");
+
   RANDOMX_EXPORT::randomx_dataset *dataset = RANDOMX_EXPORT::randomx_alloc_dataset(flags);
+
+  pn("Got dataset");
 
   unsigned long datasetItemCount = RANDOMX_EXPORT::randomx_dataset_item_count();
   std::thread t1DS(&randomx_init_dataset, dataset, cache, 0, datasetItemCount / 2);
@@ -1287,10 +1293,14 @@ int main() {
   t1DS.join();
   t2DS.join();
 
-  randomx_vm *vm = RANDOMX_EXPORT::randomx_create_vm(flags, cache, dataset);
-  RANDOMX_EXPORT::randomx_release_cache(cache);
-  RANDOMX_EXPORT::randomx_release_dataset(dataset);
+  pn("Got datasetItems");
 
+  randomx_vm *vm = RANDOMX_EXPORT::randomx_create_vm(flags, cache, dataset);
+  //RANDOMX_EXPORT::randomx_release_cache(cache);
+  //RANDOMX_EXPORT::randomx_release_dataset(dataset);
+
+  pn("Got vm");
+  pn("Starting to hash");
   RANDOMX_EXPORT::randomx_calculate_hash(vm, myInput, sizeof(myInput), hash);
 
   for (unsigned i = 0; i < RANDOMX_HASH_SIZE; ++i)
