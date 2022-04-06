@@ -1262,6 +1262,43 @@ void CLIinput(Logger log, Stratum stratum, Miner miner){
   }
 }
 
+long getTime(){
+  return chrono::duration_cast<chrono::milliseconds>(chrono::system_clock::now().time_since_epoch()).count();
+}
+
+void benchmarkingForRandomX(){
+  // first get the time
+  long long startTime = getTime();
+
+  // then do the benchmarking
+
+  // varibles to hash
+  const char myKey[] = "0123456789abcdef";
+  const char myInput[] = "0123456789abcdefg";
+  
+
+  // make the VM with different parameters
+  // - flags
+  // - different dataset thread counts (1, 2, 4, 8, 16, 32, 64, 128, 256)
+  int datasetThreadCounts[] = {1, 2, 4, 8, 16, 32, 64, 128, 256};
+  int datasetThreadCountsSize = sizeof(datasetThreadCounts)/sizeof(int);
+  // - different hash thread counts (1, 2, 4, 8, 16, 32, 64, 128, 256)
+  int hashThreadCounts[] = {1, 2, 4, 8, 16, 32, 64, 128, 256};
+  int hashThreadCountsSize = sizeof(hashThreadCounts)/sizeof(int);
+  // - different flage ( RANDOMX_FLAG_DEFAULT, RANDOMX_FLAG_LARGE_PAGES, RANDOMX_FLAG_HARD_AES, RANDOMX_FLAG_FULL_MEM, RANDOMX_FLAG_JIT, RANDOMX_FLAG_SECURE, RANDOMX_FLAG_ARGON2_SSSE3, RANDOMX_FLAG_ARGON2_AVX2, RANDOMX_FLAG_ARGON2 )
+  //randomx_flags flags[] = {RANDOMX_FLAG_DEFAULT, RANDOMX_FLAG_LARGE_PAGES, RANDOMX_FLAG_HARD_AES, RANDOMX_FLAG_FULL_MEM, RANDOMX_FLAG_JIT, RANDOMX_FLAG_SECURE, RANDOMX_FLAG_ARGON2_SSSE3, RANDOMX_FLAG_ARGON2_AVX2, RANDOMX_FLAG_ARGON2};
+
+  // test every combination of flags and thread counts for each dataset and hash
+  // going to take some time to complete
+
+  // https://www.onlinegdb.com/online_c++_compiler
+  // https://stackoverflow.com/questions/9430568/generating-combinations-in-c
+
+
+
+
+}
+
 // MAIN
 int main() { 
 
@@ -1270,7 +1307,7 @@ int main() {
   const char myInput[] = "0123456789abcdefg";
   char hash[RANDOMX_HASH_SIZE];
 
-  randomx_flags flags = RANDOMX_EXPORT::randomx_get_flags();
+  randomx_flags flags = randomx_get_flags();
   flags |= RANDOMX_FLAG_JIT;
   flags |= RANDOMX_FLAG_FULL_MEM;
   flags |= RANDOMX_FLAG_HARD_AES;
@@ -1307,6 +1344,17 @@ int main() {
     std::cout << std::hex << std::setw(2) << std::setfill('0') << ((int)hash[i] & 0xff);
 
   std::cout << std::endl; 
+
+  // end testing for randomx
+  // benchmarking for randomx
+
+  // to set dataset threads
+  // https://github.com/tevador/RandomX/blob/master/src/tests/benchmark.cpp#L312
+
+  pn("Benchmarking RandomX");
+  pn("This will take a while");
+
+  
 
   return 0;
 
