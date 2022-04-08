@@ -16,6 +16,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <chrono>
+#include <atomic>
 
 #include "json.hpp"
 #include "sha256.h"
@@ -1048,6 +1049,8 @@ private:
     return HashedHeader;
   }
 
+  // Mining function for randomx,
+
   static string doRandomX(json work, string lTI, Logger log){
     // use the randomX algorithm to get hash
     
@@ -1262,8 +1265,42 @@ void CLIinput(Logger log, Stratum stratum, Miner miner){
   }
 }
 
+// TODO:
+// - Have benchmark work on the dataset first
+// - Then benchmaek mining speed threads
+
 long getTime(){
   return chrono::duration_cast<chrono::milliseconds>(chrono::system_clock::now().time_since_epoch()).count();
+}
+
+void store32(void *dst, uint32_t w) {
+#if defined(NATIVE_LITTLE_ENDIAN)
+	memcpy(dst, &w, sizeof w);
+#else
+	uint8_t *p = (uint8_t *)dst;
+	*p++ = (uint8_t)w;
+	w >>= 8;
+	*p++ = (uint8_t)w;
+	w >>= 8;
+	*p++ = (uint8_t)w;
+	w >>= 8;
+	*p++ = (uint8_t)w;
+#endif
+}
+
+// acutal mining
+int RXnonce = 0;
+char hash[RANDOMX_HASH_SIZE];
+void mineRX(Logger log, randomx_vm * vm, const char *input, size_t input_len) {
+  //
+  randomx_calculate_hash_first(vm, input, input_len);
+//                           \/ Testing hash size
+  int testingMaxNonceCount = 1000;
+  while(RXnonce <= testingMaxNonceCount){
+    RXnonce++;
+    
+    
+  }
 }
 
 void benchmarkingForRandomX(){
@@ -1275,6 +1312,10 @@ void benchmarkingForRandomX(){
   // varibles to hash
   const char myKey[] = "0123456789abcdef";
   const char myInput[] = "0123456789abcdefg";
+
+  // flags for VM
+  randomx_flags flags = randomx_get_flags();
+  flags |= RANDOMX_FLAG_FULL_MEM;
   
 
   // make the VM with different parameters
@@ -1285,16 +1326,67 @@ void benchmarkingForRandomX(){
   // - different hash thread counts (1, 2, 4, 8, 16, 32, 64, 128, 256)
   int hashThreadCounts[] = {1, 2, 4, 8, 16, 32, 64, 128, 256};
   int hashThreadCountsSize = sizeof(hashThreadCounts)/sizeof(int);
-  // - different flage ( RANDOMX_FLAG_DEFAULT, RANDOMX_FLAG_LARGE_PAGES, RANDOMX_FLAG_HARD_AES, RANDOMX_FLAG_FULL_MEM, RANDOMX_FLAG_JIT, RANDOMX_FLAG_SECURE, RANDOMX_FLAG_ARGON2_SSSE3, RANDOMX_FLAG_ARGON2_AVX2, RANDOMX_FLAG_ARGON2 )
-  //randomx_flags flags[] = {RANDOMX_FLAG_DEFAULT, RANDOMX_FLAG_LARGE_PAGES, RANDOMX_FLAG_HARD_AES, RANDOMX_FLAG_FULL_MEM, RANDOMX_FLAG_JIT, RANDOMX_FLAG_SECURE, RANDOMX_FLAG_ARGON2_SSSE3, RANDOMX_FLAG_ARGON2_AVX2, RANDOMX_FLAG_ARGON2};
 
-  // test every combination of flags and thread counts for each dataset and hash
+  // keep track of threads and vm's
+  std::vector<std::thread> threads;
+  std::vector<randomx_vm*> vms;
+
+  // run every combination of the above
+  for(int i = 0; i < datasetThreadCountsSize; i++){
+    for(int j = 0; j < hashThreadCountsSize; j++){
+      // make the VM
+      
+      // get the cache
+      randomx_cache* cache = randomx_alloc_cache(flags);
+      randomx_init_cache(cache, myKey, sizeof(myKey));
+      // make the dataset
+      randomx_dataset* dataset = randomx_alloc_dataset(flags);
+      uint32_t datasetItemCount = randomx_dataset_item_count();
+      if(datasetItemCount > 1){
+        auto perThread = datasetItemCount / datasetThreadCounts[i];
+        auto remainder = datasetItemCount % datasetThreadCounts[i];
+        uint32_t startItem = 0;
+        for(int k = 0; k < datasetThreadCounts[i]; k++){
+          auto count = perThread + (k == datasetThreadCounts[i] - 1 ? remainder : 0);
+          threads.push_back(std::thread(randomx_init_dataset, dataset, cache, startItem, count, flags));
+          startItem += count;
+        }
+        for(unsigned k = 0; k < threads.size(); k++){
+          threads[k].join();
+        }
+      }else{
+        randomx_init_dataset(dataset, cache, 0, datasetItemCount);
+      }
+      randomx_release_cache(cache);
+      cache = nullptr;
+      threads.clear();
+
+      // make the VM
+      for(int k = 0; k < hashThreadCounts[j]; k++){
+        randomx_vm *vm = randomx_create_vm(flags, cache, dataset);
+        if(vm==nullptr){
+          p("VM is null!");
+          //return false;
+        }
+        vms.push_back(vm);
+      }
+
+      // hash the input
+      if(hashThreadCounts[j] > 1){
+        for(unsigned k = 0; k < vms.size(); k++){
+          int cpuid = -1;
+          //threads.push_back(std::thread(func, ));
+        }
+    }
+  }
+  }
+
   // going to take some time to complete
 
   // https://www.onlinegdb.com/online_c++_compiler
   // https://stackoverflow.com/questions/9430568/generating-combinations-in-c
 
-
+  
 
 
 }
@@ -1302,46 +1394,12 @@ void benchmarkingForRandomX(){
 // MAIN
 int main() { 
 
-  // testing for randomx
-  const char myKey[] = "0123456789abcdef";
-  const char myInput[] = "0123456789abcdefg";
-  char hash[RANDOMX_HASH_SIZE];
 
-  randomx_flags flags = randomx_get_flags();
-  flags |= RANDOMX_FLAG_JIT;
-  flags |= RANDOMX_FLAG_FULL_MEM;
-  flags |= RANDOMX_FLAG_HARD_AES;
-  flags |= RANDOMX_FLAG_ARGON2_SSSE3;
+  // randomx_init_cache(cache, "SEEDHASH", 32);
+  //
+  //
+  // randomx_calculate_hash(vm, "INPUT(I THINK BLOB)", sizeof("INPUT(I THINK BLOB)"), hashOut);
 
-  pn("Got flags");
-
-  randomx_cache* cache = RANDOMX_EXPORT::randomx_alloc_cache(flags);
-  RANDOMX_EXPORT::randomx_init_cache(cache, myKey, sizeof(myKey));
-
-  pn("Got cache");
-
-  RANDOMX_EXPORT::randomx_dataset *dataset = RANDOMX_EXPORT::randomx_alloc_dataset(flags);
-
-  pn("Got dataset");
-
-  unsigned long datasetItemCount = RANDOMX_EXPORT::randomx_dataset_item_count();
-  std::thread t1DS(&randomx_init_dataset, dataset, cache, 0, datasetItemCount / 2);
-  std::thread t2DS(&randomx_init_dataset, dataset, cache, datasetItemCount / 2, datasetItemCount - datasetItemCount / 2);
-  t1DS.join();
-  t2DS.join();
-
-  pn("Got datasetItems");
-
-  randomx_vm *vm = RANDOMX_EXPORT::randomx_create_vm(flags, cache, dataset);
-  //RANDOMX_EXPORT::randomx_release_cache(cache);
-  //RANDOMX_EXPORT::randomx_release_dataset(dataset);
-
-  pn("Got vm");
-  pn("Starting to hash");
-  RANDOMX_EXPORT::randomx_calculate_hash(vm, myInput, sizeof(myInput), hash);
-
-  for (unsigned i = 0; i < RANDOMX_HASH_SIZE; ++i)
-    std::cout << std::hex << std::setw(2) << std::setfill('0') << ((int)hash[i] & 0xff);
 
   std::cout << std::endl; 
 
