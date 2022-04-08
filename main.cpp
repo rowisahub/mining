@@ -1269,6 +1269,7 @@ void CLIinput(Logger log, Stratum stratum, Miner miner){
 // - Have benchmark work on the dataset first
 // - Then benchmaek mining speed threads
 
+/*
 long getTime(){
   return chrono::duration_cast<chrono::milliseconds>(chrono::system_clock::now().time_since_epoch()).count();
 }
@@ -1390,6 +1391,7 @@ void benchmarkingForRandomX(){
 
 
 }
+*/
 
 // MAIN
 int main() { 
@@ -1401,7 +1403,7 @@ int main() {
   // randomx_calculate_hash(vm, "INPUT(I THINK BLOB)", sizeof("INPUT(I THINK BLOB)"), hashOut);
 
 
-  std::cout << std::endl; 
+  //std::cout << std::endl; 
 
   // end testing for randomx
   // benchmarking for randomx
@@ -1409,12 +1411,12 @@ int main() {
   // to set dataset threads
   // https://github.com/tevador/RandomX/blob/master/src/tests/benchmark.cpp#L312
 
-  pn("Benchmarking RandomX");
-  pn("This will take a while");
+  //pn("Benchmarking RandomX");
+  //pn("This will take a while");
 
   
 
-  return 0;
+  //return 0;
 
   
   // byte ba[] = { 0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00,
