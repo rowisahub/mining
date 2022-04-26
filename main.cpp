@@ -1013,6 +1013,7 @@ private:
     std::snprintf( buf.get(), size, format.c_str(), args ... );
     return std::string( buf.get(), buf.get() + size - 1 ); // We don't want the '\0' inside
   }
+
   static string intTo4ByteString(unsigned long n){
     unsigned char bytes[4];
     bytes[0] = (n >> 24) & 0xFF;
@@ -1020,9 +1021,71 @@ private:
     bytes[2] = (n >> 8) & 0xFF;
     bytes[3] = n & 0xFF;
     reverse(bytes, bytes + (sizeof(bytes)/sizeof(bytes[0])));
-    return string_format("%02x%02x%02x%02x\n", (int)bytes[0], (int)bytes[1], (int)bytes[2], (int)bytes[3]);
+    return string_format("%02x%02x%02x%02x", (int)bytes[0], (int)bytes[1], (int)bytes[2], (int)bytes[3]);
   }
+  
+  static randomx_vm *vm;
+  static void createRandomXVM(Logger log, json initWork){
+    bool lp = true;
+    bool fm = true;
 
+    randomx_dataset* dataset;
+    randomx_cache* cache;
+    randomx_flags flags;
+
+    flags = randomx_get_flags();
+    flags |= RANDOMX_FLAG_LARGE_PAGES;
+    cache = randomx_alloc_cache(flags);
+    if(cache == NULL){ 
+      lp = false;
+      log.print(log.WARNING, "Can't use Large Pages!");
+    }
+    flags = randomx_get_flags();
+    flags |= RANDOMX_FLAG_FULL_MEM;
+    cache = randomx_alloc_cache(flags);
+    if(cache == NULL){ 
+      fm = false;
+      log.print(log.FATEL, "Can't use Full Memory(2080MB)! This means your mining is going to be super slow");
+        
+    }
+    flags = randomx_get_flags();
+    if(lp) flags |= RANDOMX_FLAG_LARGE_PAGES;
+    if(fm) flags |= RANDOMX_FLAG_FULL_MEM;
+
+    cache = randomx_alloc_cache(flags);
+    const char *seedHash = "seedHash";
+    randomx_init_cache(cache, seedHash, 32);
+
+    dataset = randomx_alloc_dataset(flags);
+
+    int cpuCoreCount = thread::hardware_concurrency();
+    int datasetItemCount = randomx_dataset_item_count();
+    vector<thread> threads;
+
+    if(fm){
+      if(cpuCoreCount != 1){
+        int perThread = datasetItemCount / cpuCoreCount;
+        int remainder = datasetItemCount % cpuCoreCount;
+        int startItem = 0;
+        
+        for(int i = 0; i < cpuCoreCount; ++i){
+          int count = perThread + (i == cpuCoreCount - 1 ? remainder : 0);
+          threads.push_back(thread(&randomx_init_dataset, dataset, cache, startItem, count));
+          startItem += count;
+        }
+        for(int i = 0; i < threads.size(); ++i){
+          threads[i].join();
+        }
+        
+      } else {
+        randomx_init_dataset(dataset, cache, 0, datasetItemCount);
+      }
+      randomx_release_cache(cache);
+      cache = nullptr;
+      threads.clear();
+    }
+    vm = randomx_create_vm(flags, cache, dataset);
+  }
 
   static void displayMinerInfo(Logger log){
     log.print(log.DEBUG, log.MINER_THREAD_HASHRATE, "Starting Miner Info, waiting 30 seconds.");
