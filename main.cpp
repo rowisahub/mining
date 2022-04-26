@@ -937,6 +937,8 @@ int NonceSize = 4;
 
 int allHash = 0;
 
+bool isVMReady = false;
+
 
 class Miner {
 private:
@@ -1024,28 +1026,35 @@ private:
     return string_format("%02x%02x%02x%02x", (int)bytes[0], (int)bytes[1], (int)bytes[2], (int)bytes[3]);
   }
   
-  static randomx_vm *vm;
-  static void createRandomXVM(Logger log, json initWork){
+  //static randomx_vm *vm;
+  static randomx_vm* createRandomXVM(Logger log, string lTI, json initWork){
     bool lp = true;
     bool fm = true;
+
+    //log.print(log.DEBUG, log.MINER_THREAD, lTI, "");
+
+    string seedHash = (string)initWork["params"]["seed_hash"];
+    string blob = initWork["params"]["blob"];
 
     randomx_dataset* dataset;
     randomx_cache* cache;
     randomx_flags flags;
+
+    log.print(log.DEBUG, log.MINER_THREAD, lTI, "Creating RandomX Cache!");
 
     flags = randomx_get_flags();
     flags |= RANDOMX_FLAG_LARGE_PAGES;
     cache = randomx_alloc_cache(flags);
     if(cache == NULL){ 
       lp = false;
-      log.print(log.WARNING, "Can't use Large Pages!");
+      log.print(log.WARNING, log.MINER_THREAD, lTI, "Can't use Large Pages!");
     }
     flags = randomx_get_flags();
     flags |= RANDOMX_FLAG_FULL_MEM;
     cache = randomx_alloc_cache(flags);
     if(cache == NULL){ 
       fm = false;
-      log.print(log.FATEL, "Can't use Full Memory(2080MB)! This means your mining is going to be super slow");
+      log.print(log.WARNING, log.MINER_THREAD, lTI, "Can't use Full Memory(2080MB)! This means your mining is going to be super slow");
         
     }
     flags = randomx_get_flags();
@@ -1053,8 +1062,11 @@ private:
     if(fm) flags |= RANDOMX_FLAG_FULL_MEM;
 
     cache = randomx_alloc_cache(flags);
-    const char *seedHash = "seedHash";
-    randomx_init_cache(cache, seedHash, 32);
+    const char *seedHashc = seedHash.c_str();
+    randomx_init_cache(cache, seedHashc, 32);
+
+    log.print(log.DEBUG, log.MINER_THREAD, lTI, "Created RandomX Cache!");
+    log.print(log.DEBUG, log.MINER_THREAD, lTI, "Creating RandomX Dataset!");
 
     dataset = randomx_alloc_dataset(flags);
 
@@ -1084,7 +1096,12 @@ private:
       cache = nullptr;
       threads.clear();
     }
-    vm = randomx_create_vm(flags, cache, dataset);
+    log.print(log.DEBUG, log.MINER_THREAD, lTI, "Created RandomX Dataset!");
+
+    log.print(log.DEBUG, log.MINER_THREAD, lTI, "Creating RandomX VM!");
+    randomx_vm *vm = randomx_create_vm(flags, cache, dataset);
+    log.print(log.DEBUG, log.MINER_THREAD, lTI, "Created RandomX VM!");
+    return vm;
   }
 
   static void displayMinerInfo(Logger log){
@@ -1140,14 +1157,20 @@ private:
 
   // Mining function for randomx,
 
-  static string doRandomX(json work, string lTI, Logger log){
+  static string doRandomX(Logger log, string lTI, randomx_vm *vm, json work){
     // use the randomX algorithm to get hash
-    
-    // intTo4ByteString(hashCount)
-    // string blob = work.blob;
-    // string fpb = blob.substr(0,blob.find("00000000"));
-    // string spb = blob.substr((int)blob.find("00000000")+8, blob.length());
-    // string fullHeader = fpb + intTo4ByteString(nonce) + spb;
+    string nonce = intTo4ByteString((long)work["jobData"]["currentNonce"]);
+    string blob = work["params"]["blob"];
+    string fpb = blob.substr(0,blob.find("00000000"));
+    string spb = blob.substr((int)blob.find("00000000")+8, blob.length());
+    string fullHeader = fpb + nonce + spb;
+    char *hash;
+    randomx_calculate_hash(vm, fullHeader.c_str(), fullHeader.length(), hash);
+    while(hash == nullptr){
+      log.print(log.DEBUG, log.MINER_THREAD_HASH, lTI, "RandomX Hash is null, retrying...");
+      randomx_calculate_hash(vm, fullHeader.c_str(), fullHeader.length(), hash);
+    }
+    return string(hash);
   }
 
   // thread function for the actull mining
@@ -1161,6 +1184,15 @@ private:
     string lTI = to_string(thisMinerID);
     
     log.print(log.DEBUG, log.MINER_THREAD, lTI, "Miner Thread Started!");
+
+    randomx_vm *vm;
+
+    switch(miningAlgorithm){
+        case randomXAlgo:{
+          vm = createRandomXVM(log, lTI, wQueue.getLatestWork());
+          break;
+        }
+      };
 
     json currentJob;
     int ri = 0;
@@ -1231,14 +1263,10 @@ private:
 
             break;
           }
-          case randomXAlgo:{
-            // make a randomX header
-
-            break;
+          case randomXAlgo: {
+            hashCount = 0;
           }
         };
-
-        
       }
       currentJob["jobData"]["currentNonce"] = hashCount;
 
@@ -1249,6 +1277,7 @@ private:
           break;
         case randomXAlgo:
           //hashedString = ;
+          hashedString = doRandomX(log, lTI, vm, currentJob);
           break;
       };
 
@@ -1285,6 +1314,21 @@ private:
   int threadCount = 0;
   bool startMining(int ctc) {
     // Will need to start miners with the number of threads
+
+    /*
+    switch(miningAlgorithm){
+      case sha256Algo:
+        
+        break;
+      case randomXAlgo:
+        log.print(log.INFO, log.MINER_MAIN, "Creating RandomX VM!");
+        createRandomXVM(log, wQueue.getLatestWork());
+        while(!isVMReady) sleep(1);
+        log.print(log.DEBUG, log.MINER_MAIN, "Created RandomX VM! Starting Mining!");
+        break;
+    };
+    */
+
     threadCount = ctc;
     log.print(log.INFO, log.MINER_MAIN, "Starting mining, thread count: "+to_string(ctc));
     for (int i = 0; i < ctc; i++) {
