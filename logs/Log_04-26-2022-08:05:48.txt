@@ -1,0 +1,230 @@
+/*
+Time: 04/26/2022 08:05:48
+Log File for My Miner!
+*/
+
+[04/26/2022-08:05:48][[37mINFO[0m][STRATUM] ► Tring to connect to socket...
+[04/26/2022-08:05:48][[37mINFO[0m][STRATUM] ► Succesfuly Connected to Socket!
+[04/26/2022-08:05:48][[36mDEBUG[0m][STRATUM_NOTIFY] ► Job: {
+    "id": null,
+    "jobData": {
+        "difficulty": 32768,
+        "extraNonce1": "30411c3d",
+        "extraNonce2Size": 4,
+        "target": "ffff0100",
+        "workerName": ""
+    },
+    "method": "job",
+    "params": {
+        "blob": "0e0ecd92a093066b3983392183ccff7fc274bed934766d56fb6513ece811d5149c4c415b7c24e600000000ace58cb819bca31bfe8d70cebf0f2a57e6838404701367ee73e5cd0ee398fedf06",
+        "height": 2610437,
+        "id": null,
+        "job_id": "5af3231",
+        "next_seed_hash": "",
+        "seed_hash": "0b60d680ef8e06c4d02e7aa66a6c2fc1ac4a1b6d4fceb013df41f7b4ea037ea3",
+        "target": "ffff0100"
+    }
+}
+[04/26/2022-08:05:48][[36mDEBUG[0m][STRATUM_NOTIFY] ► Target: ffff0100
+[04/26/2022-08:05:48][[36mDEBUG[0m][STRATUM_NOTIFY] ► randomX
+[04/26/2022-08:05:48][[37mINFO[0m][STRATUM_NOTIFY] ► Got Notify Message!
+[04/26/2022-08:05:48][[37mINFO[0m][STRATUM_SUBSCRIBE] ► Got Sub Message!
+[04/26/2022-08:05:48][[36mDEBUG[0m][STRATUM] ► Found new message: {
+    "id": null,
+    "method": "job",
+    "params": {
+        "blob": "0e0ecd92a093066b3983392183ccff7fc274bed934766d56fb6513ece811d5149c4c415b7c24e600000000ace58cb819bca31bfe8d70cebf0f2a57e6838404701367ee73e5cd0ee398fedf06",
+        "height": 2610437,
+        "id": null,
+        "job_id": "5af3231",
+        "next_seed_hash": "",
+        "seed_hash": "0b60d680ef8e06c4d02e7aa66a6c2fc1ac4a1b6d4fceb013df41f7b4ea037ea3",
+        "target": "ffff0100"
+    }
+}
+[04/26/2022-08:05:48][[36mDEBUG[0m][STRATUM] ► New Loop
+[04/26/2022-08:05:48][[36mDEBUG[0m][STRATUM] ► Found new message: {
+    "error": null,
+    "id": 1,
+    "result": [
+        [
+            [
+                "mining.notify",
+                "ae6812eb4cd7735a302a8a9dd95cf71f"
+            ],
+            [
+                "mining.set_difficulty",
+                32768.0
+            ]
+        ],
+        "30411c3d",
+        4
+    ]
+}
+[04/26/2022-08:05:48][[36mDEBUG[0m][STRATUM] ► New Loop
+[04/26/2022-08:05:48][[36mDEBUG[0m][STRATUM] ► Looking for new messages
+[04/26/2022-08:05:48][[36mDEBUG[0m][STRATUM] ► Sending Json: {
+    "id": 1,
+    "method": "mining.subscribe",
+    "params": []
+}
+[04/26/2022-08:05:48][[37mINFO[0m][STRATUM] ► Subscribing to Stratum's blockchain!
+[04/26/2022-08:05:48][[37mINFO[0m][STRATUM] ► Waiting for Messages!
+[04/26/2022-08:05:49][[36mDEBUG[0m][STRATUM_NOTIFY] ► Job: {
+    "id": null,
+    "jobData": {
+        "difficulty": 32768,
+        "extraNonce1": "30411c3d",
+        "extraNonce2Size": 4,
+        "target": "ffff0100",
+        "workerName": ""
+    },
+    "method": "job",
+    "params": {
+        "blob": "0e0ed194a09306e9deda509a8eae40defdf1fb20e4ab8caa0a5939587907350ad4137aa1b430a900000000c5a7a3549b24302cf31b644b385e3c5a91023f5548c3196c457f0237a80ffcca5d",
+        "height": 2610438,
+        "id": null,
+        "job_id": "5af3344",
+        "next_seed_hash": "",
+        "seed_hash": "0b60d680ef8e06c4d02e7aa66a6c2fc1ac4a1b6d4fceb013df41f7b4ea037ea3",
+        "target": "ffff0100"
+    }
+}
+[04/26/2022-08:05:49][[36mDEBUG[0m][STRATUM_NOTIFY] ► Target: ffff0100
+[04/26/2022-08:05:49][[36mDEBUG[0m][STRATUM_NOTIFY] ► randomX
+[04/26/2022-08:05:49][[37mINFO[0m][STRATUM_NOTIFY] ► Got Notify Message!
+[04/26/2022-08:05:49][[36mDEBUG[0m][STRATUM] ► Sending Json: {
+    "id": 2,
+    "method": "mining.authorize",
+    "params": [
+        "rowisamine",
+        "a=randomx,n=001,o=CPPtesting,d=256"
+    ]
+}
+[04/26/2022-08:05:49][[36mDEBUG[0m][STRATUM] ► User: rowisamine, Pass: a=randomx,n=001,o=CPPtesting,d=256
+[04/26/2022-08:05:49][[36mDEBUG[0m][STRATUM] ► New Loop
+[04/26/2022-08:05:49][[36mDEBUG[0m][STRATUM_NOTIFY] ► Job: {
+    "id": null,
+    "jobData": {
+        "difficulty": 32768,
+        "extraNonce1": "30411c3d",
+        "extraNonce2Size": 4,
+        "target": "ffffff00",
+        "workerName": ""
+    },
+    "method": "job",
+    "params": {
+        "blob": "0e0ed194a09306e9deda509a8eae40defdf1fb20e4ab8caa0a5939587907350ad4137aa1b430a900000000b333cd6294b20fca65b95010e5a921068d96edd875ce2b2c8bc9e7017488f5cd5d",
+        "height": 2610438,
+        "id": "rowisamine",
+        "job_id": "5af3348",
+        "next_seed_hash": "",
+        "seed_hash": "0b60d680ef8e06c4d02e7aa66a6c2fc1ac4a1b6d4fceb013df41f7b4ea037ea3",
+        "target": "ffffff00"
+    }
+}
+[04/26/2022-08:05:49][[36mDEBUG[0m][STRATUM_NOTIFY] ► Target: ffffff00
+[04/26/2022-08:05:49][[36mDEBUG[0m][STRATUM_NOTIFY] ► randomX
+[04/26/2022-08:05:49][[37mINFO[0m][STRATUM_NOTIFY] ► Got Notify Message!
+[04/26/2022-08:05:49][[37mINFO[0m][STRATUM_AUTHORIZE] ► Got Auth Message!
+[04/26/2022-08:05:49][[36mDEBUG[0m][STRATUM] ► Found new message: {
+    "id": null,
+    "method": "job",
+    "params": {
+        "blob": "0e0ed194a09306e9deda509a8eae40defdf1fb20e4ab8caa0a5939587907350ad4137aa1b430a900000000b333cd6294b20fca65b95010e5a921068d96edd875ce2b2c8bc9e7017488f5cd5d",
+        "height": 2610438,
+        "id": "rowisamine",
+        "job_id": "5af3348",
+        "next_seed_hash": "",
+        "seed_hash": "0b60d680ef8e06c4d02e7aa66a6c2fc1ac4a1b6d4fceb013df41f7b4ea037ea3",
+        "target": "ffffff00"
+    }
+}
+[04/26/2022-08:05:49][[36mDEBUG[0m][STRATUM] ► Found new message: {
+    "error": null,
+    "id": 2,
+    "result": true
+}
+[04/26/2022-08:05:49][[36mDEBUG[0m][STRATUM] ► New Loop
+[04/26/2022-08:05:49][[36mDEBUG[0m][STRATUM] ► Looking for new messages
+[04/26/2022-08:05:49][[37mINFO[0m][STRATUM] ► Authorizing Miner Credentiols Credentials!
+[04/26/2022-08:05:49][[36mDEBUG[0m][STRATUM] ► Subscribe Responce Message: {
+    "error": null,
+    "id": 1,
+    "result": [
+        [
+            [
+                "mining.notify",
+                "ae6812eb4cd7735a302a8a9dd95cf71f"
+            ],
+            [
+                "mining.set_difficulty",
+                32768.0
+            ]
+        ],
+        "30411c3d",
+        4
+    ]
+}
+[04/26/2022-08:05:49][[36mDEBUG[0m][STRATUM] ► Found new message: {
+    "id": null,
+    "method": "job",
+    "params": {
+        "blob": "0e0ed194a09306e9deda509a8eae40defdf1fb20e4ab8caa0a5939587907350ad4137aa1b430a900000000c5a7a3549b24302cf31b644b385e3c5a91023f5548c3196c457f0237a80ffcca5d",
+        "height": 2610438,
+        "id": null,
+        "job_id": "5af3344",
+        "next_seed_hash": "",
+        "seed_hash": "0b60d680ef8e06c4d02e7aa66a6c2fc1ac4a1b6d4fceb013df41f7b4ea037ea3",
+        "target": "ffff0100"
+    }
+}
+[04/26/2022-08:05:49][[36mDEBUG[0m][STRATUM] ► New Loop
+[04/26/2022-08:05:49][[36mDEBUG[0m][STRATUM] ► Looking for new messages
+[04/26/2022-08:05:50][[36mDEBUG[0m][STRATUM] ► Authorize Responce Message: {
+    "error": null,
+    "id": 2,
+    "result": true
+}
+[04/26/2022-08:06:03][[37mINFO[0m][STRATUM] ► Closing Stratum Messages thread!
+[04/26/2022-08:06:03][[37mINFO[0m][MINER] ► Miner Closed!
+[04/26/2022-08:06:03][[37mINFO[0m][MINER] ► Closing Miner!
+[04/26/2022-08:06:03][[37mINFO[0m] ► Closing Everything Now!
+[04/26/2022-08:06:41][[36mDEBUG[0m][STRATUM_NOTIFY] ► Job: {
+    "id": null,
+    "jobData": {
+        "difficulty": 32768,
+        "extraNonce1": "30411c3d",
+        "extraNonce2Size": 4,
+        "target": "ffffff00",
+        "workerName": "rowisamine"
+    },
+    "method": "job",
+    "params": {
+        "blob": "0e0ed194a09306e9deda509a8eae40defdf1fb20e4ab8caa0a5939587907350ad4137aa1b430a900000000e660f09c925c7e892a85e15fcdf44f312e0e4cc57ca31cc963cb8be23fe2e4935d",
+        "height": 2610438,
+        "id": "rowisamine",
+        "job_id": "5af5f6c",
+        "next_seed_hash": "",
+        "seed_hash": "0b60d680ef8e06c4d02e7aa66a6c2fc1ac4a1b6d4fceb013df41f7b4ea037ea3",
+        "target": "ffffff00"
+    }
+}
+[04/26/2022-08:06:41][[36mDEBUG[0m][STRATUM_NOTIFY] ► Target: ffffff00
+[04/26/2022-08:06:41][[36mDEBUG[0m][STRATUM_NOTIFY] ► randomX
+[04/26/2022-08:06:41][[37mINFO[0m][STRATUM_NOTIFY] ► Got Notify Message!
+[04/26/2022-08:06:41][[36mDEBUG[0m][STRATUM] ► Found new message: {
+    "id": null,
+    "method": "job",
+    "params": {
+        "blob": "0e0ed194a09306e9deda509a8eae40defdf1fb20e4ab8caa0a5939587907350ad4137aa1b430a900000000e660f09c925c7e892a85e15fcdf44f312e0e4cc57ca31cc963cb8be23fe2e4935d",
+        "height": 2610438,
+        "id": "rowisamine",
+        "job_id": "5af5f6c",
+        "next_seed_hash": "",
+        "seed_hash": "0b60d680ef8e06c4d02e7aa66a6c2fc1ac4a1b6d4fceb013df41f7b4ea037ea3",
+        "target": "ffffff00"
+    }
+}
+[04/26/2022-08:06:41][[36mDEBUG[0m][STRATUM] ► New Loop
+[04/26/2022-08:06:41][[36mDEBUG[0m][STRATUM] ► Looking for new messages

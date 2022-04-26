@@ -17,6 +17,7 @@
 #include <sys/stat.h>
 #include <chrono>
 #include <atomic>
+#include <memory>
 
 #include "json.hpp"
 #include "sha256.h"
@@ -943,6 +944,12 @@ private:
   Logger log;
   Stratum stratum;
 
+  void startRandomXVM(){
+    log.print(log.INFO, log.MINER_MAIN, "Starting RandomX VM!");
+    // RandomX
+    
+  }
+
   static string sha256d(string inString) { 
     SHA256 sha256;
     return sha256(sha256(inString)); 
@@ -995,6 +1002,25 @@ private:
       }
     }
     return intToHexString;
+  }
+
+
+  template<typename ... Args>
+  static string string_format( const std::string& format, Args ... args ){
+    int size_s = std::snprintf( nullptr, 0, format.c_str(), args ... ) + 1; // Extra space for '\0'
+    auto size = static_cast<size_t>( size_s );
+    std::unique_ptr<char[]> buf( new char[ size ] );
+    std::snprintf( buf.get(), size, format.c_str(), args ... );
+    return std::string( buf.get(), buf.get() + size - 1 ); // We don't want the '\0' inside
+  }
+  static string intTo4ByteString(unsigned long n){
+    unsigned char bytes[4];
+    bytes[0] = (n >> 24) & 0xFF;
+    bytes[1] = (n >> 16) & 0xFF;
+    bytes[2] = (n >> 8) & 0xFF;
+    bytes[3] = n & 0xFF;
+    reverse(bytes, bytes + (sizeof(bytes)/sizeof(bytes[0])));
+    return string_format("%02x%02x%02x%02x\n", (int)bytes[0], (int)bytes[1], (int)bytes[2], (int)bytes[3]);
   }
 
 
@@ -1054,6 +1080,11 @@ private:
   static string doRandomX(json work, string lTI, Logger log){
     // use the randomX algorithm to get hash
     
+    // intTo4ByteString(hashCount)
+    // string blob = work.blob;
+    // string fpb = blob.substr(0,blob.find("00000000"));
+    // string spb = blob.substr((int)blob.find("00000000")+8, blob.length());
+    // string fullHeader = fpb + intTo4ByteString(nonce) + spb;
   }
 
   // thread function for the actull mining
