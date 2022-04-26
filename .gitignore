@@ -1,1 +1,5 @@
-bLibs/RandomX
+bLibs/*
+main
+main.o
+main.cpp.sha1
+logs/*
