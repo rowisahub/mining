@@ -1281,6 +1281,9 @@ private:
           break;
       };
 
+      //
+      log.print(log.DEBUG, log.MINER_THREAD, lTI, "Hashed String: "+hashedString);
+
       bool doesWork = isCurrentHashSmallerThenTheTarget(hashedString, string(currentJob["jobData"]["target"]));
 
 
@@ -1580,7 +1583,7 @@ int main() {
   stratum.authorize("rowisamine", "n=001,o=CPPtesting");
 
   //
-  //miner.start(1);
+  miner.start(1);
 
   // Everything is connected and ready to start mining
   // We need to make a miner now,
