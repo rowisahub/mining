@@ -499,16 +499,8 @@ public:
   int pendingQueueCount = 0;
   bool pendingQueueBool = false;
   void addWork(json newJsonObject) {
-    switch(miningAlgorithm){
-      case sha256Algo:
-        allWork.push_back(newJsonObject); 
-        latestWorkID = string(newJsonObject["params"][0]);
-        break;
-      case randomXAlgo:
-        allWork.push_back(newJsonObject); 
-        latestWorkID = string(newJsonObject["params"]["job_id"]);
-        break;
-    };
+    allWork.push_back(newJsonObject);
+    latestWorkID = string(newJsonObject["jobData"]["job_id"]);
     pendingQueueCount++;
   }
   vector<json> getAllWork() { return allWork; }
@@ -516,6 +508,7 @@ public:
     lastGetLastestWork = allWork.back();
     return allWork.back();
   }
+  json getLatestWorkConFree() { return allWork.back(); }
   bool newWork() {
     if (lastGetLastestWork != allWork.back())
       return true;
@@ -645,6 +638,8 @@ static string GenerateTargetFromDiff(int Diff){
         JsonMessage["jobData"]["target"] = NewTarget;
         JsonMessage["jobData"]["previousHash"] = ReverseHexStringByFours(JsonMessage["params"][1]);
         JsonMessage["jobData"]["workerName"] = authUsername;
+        JsonMessage["jobData"]["job_id"] = JsonMessage["params"][0];
+        JsonMessage["jobData"]["continue"] = JsonMessage["params"][8];
         break;
       case randomXAlgo:
         log.print(log.DEBUG, log.STRATUM_NOTIFY, "randomX");
@@ -658,6 +653,8 @@ static string GenerateTargetFromDiff(int Diff){
         JsonMessage["jobData"]["difficulty"] = difficulty;
         JsonMessage["jobData"]["target"] = NewTarget;
         JsonMessage["jobData"]["workerName"] = authUsername;
+        JsonMessage["jobData"]["job_id"] = JsonMessage["params"]["job_id"];
+        JsonMessage["jobData"]["continue"] = false;
         break;
     };
     log.print(log.DEBUG, log.STRATUM_NOTIFY, "Target: "+NewTarget);
@@ -1189,7 +1186,7 @@ private:
 
     switch(miningAlgorithm){
         case randomXAlgo:{
-          vm = createRandomXVM(log, lTI, wQueue.getLatestWork());
+          vm = createRandomXVM(log, lTI, wQueue.getLatestWorkConFree());
           break;
         }
       };
@@ -1200,13 +1197,13 @@ private:
     int hashCount = 0;
     while (!miningEnd) {
       string workID = "1010101";
-      if(ri!=0){
-        workID = string(currentJob["params"][0]);
+      if(ri>0){
+        workID = string(currentJob["jobData"]["job_id"]);
       }
       ri++;
       //pfn("Work ID: ", workID);
       if(wQueue.checkNewWorkWithID(workID)){
-        if(!wQueue.getLatestWork()["params"][8] && ri<=1) continue;
+        if(!wQueue.getLatestWork()["jobData"]["continue"] && ri==1) continue;
         currentJob = wQueue.getLatestWork();
 
 
