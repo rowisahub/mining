@@ -1,4 +1,5 @@
 bLibs/*
+bLibs/
 main
 main.o
 main.cpp.sha1
