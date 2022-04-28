@@ -5,3 +5,4 @@ main.cpp.sha1
 logs/*
 bLibs/RandomX
 .workingDir/main.cpp.sha1
+logs/
