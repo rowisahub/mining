@@ -936,6 +936,7 @@ int allHash = 0;
 
 bool isVMReady = false;
 
+int rxIT = 0;
 
 class Miner {
 private:
@@ -1024,7 +1025,7 @@ private:
   }
   
   //static randomx_vm *vm;
-  static randomx_vm* createRandomXVM(Logger log, string lTI, json initWork){
+  static randomx_vm* createRandomXVM(Logger log, string lTI, json initWork, randomx_dataset *dataset){
     bool lp = true;
     bool fm = true;
 
@@ -1033,7 +1034,7 @@ private:
     string seedHash = (string)initWork["params"]["seed_hash"];
     string blob = initWork["params"]["blob"];
 
-    randomx_dataset* dataset;
+    //randomx_dataset* dataset;
     randomx_cache* cache;
     randomx_flags flags;
 
@@ -1152,21 +1153,55 @@ private:
     return HashedHeader;
   }
 
-  // Mining function for randomx,
 
+  // Mining function for randomx,
   static string doRandomX(Logger log, string lTI, randomx_vm *vm, json work){
     // use the randomX algorithm to get hash
     string nonce = intTo4ByteString((long)work["jobData"]["currentNonce"]);
     string blob = work["params"]["blob"];
     string fpb = blob.substr(0,blob.find("00000000"));
     string spb = blob.substr((int)blob.find("00000000")+8, blob.length());
-    string fullHeader = fpb + nonce + spb;
-    char *hash;
-    randomx_calculate_hash(vm, fullHeader.c_str(), fullHeader.length(), hash);
-    while(hash == nullptr){
-      log.print(log.DEBUG, log.MINER_THREAD_HASH, lTI, "RandomX Hash is null, retrying...");
-      randomx_calculate_hash(vm, fullHeader.c_str(), fullHeader.length(), hash);
+    string header = fpb + nonce + spb;
+    //const char *headerc = header.c_str();
+    log.print(log.DEBUG, log.MINER_THREAD_HASH, lTI, "Full Job Data: "+header);
+    //log.print(log.DEBUG, log.MINER_THREAD, lTI, "Calculating Hash...");
+
+    //uint64_t hash[RANDOMX_HASH_SIZE/sizeof(uint64_t)];
+    //vector<uint8_t> myVector(header.begin(), header.end());
+    //uint8_t *un8hash = &myVector[0];
+
+    if(rxIT==0){
+      randomx_calculate_hash_first(vm, &header, header.length());
+      rxIT++;
     }
+
+    char hash[RANDOMX_HASH_SIZE];
+
+    //char *hash;
+    //randomx_calculate_hash(vm, &headerc, sizeof(headerc), hash);                 // Error is happing here
+    //log.print(log.DEBUG, log.MINER_THREAD_HASH, lTI, "Hash: "+string(hash));
+
+    //while(hash == nullptr){
+    //  log.print(log.DEBUG, log.MINER_THREAD_HASH, lTI, "RandomX Hash is null, retrying...");
+      //randomx_calculate_hash(vm, header.c_str(), header.length(), &hash); 
+    //}
+
+    randomx_calculate_hash_next(vm, &header, header.length(), &hash);
+
+    // if last
+    if(rxIT==3){
+      randomx_calculate_hash_last(vm, &hash);
+    }
+
+    //string resultingHashedString;
+    cout << "\n";
+    for(int i = 0; i < RANDOMX_HASH_SIZE; ++i){
+      std::cout << std::hex << std::setw(2) << std::setfill('0') << ((int)hash[i] & 0xff);
+    }
+    cout << "\n\n";
+
+    //log.print(log.DEBUG, log.MINER_THREAD_HASH, lTI, "hashString");
+
     return string(hash);
   }
 
@@ -1182,28 +1217,33 @@ private:
     
     log.print(log.DEBUG, log.MINER_THREAD, lTI, "Miner Thread Started!");
 
+
+    randomx_dataset* dataset;
     randomx_vm *vm;
 
     switch(miningAlgorithm){
         case randomXAlgo:{
-          vm = createRandomXVM(log, lTI, wQueue.getLatestWorkConFree());
+          vm = createRandomXVM(log, lTI, wQueue.getLatestWorkConFree(), dataset);
           break;
         }
       };
 
     json currentJob;
+    string workID = "1010101";
     int ri = 0;
 
     int hashCount = 0;
     while (!miningEnd) {
-      string workID = "1010101";
-      if(ri>0){
+      //log.print(log.DEBUG, log.MINER_THREAD, lTI, "ri: "+to_string(ri));
+      if(ri!=0){
         workID = string(currentJob["jobData"]["job_id"]);
+        //log.print(log.DEBUG, log.MINER_THREAD, lTI, "WorkID: "+workID);
       }
       ri++;
       //pfn("Work ID: ", workID);
+      //log.print(log.DEBUG, log.MINER_THREAD, lTI, "is new ID: "+to_string(wQueue.checkNewWorkWithID(workID)));
       if(wQueue.checkNewWorkWithID(workID)){
-        if(!wQueue.getLatestWork()["jobData"]["continue"] && ri==1) continue;
+        if(wQueue.getLatestWork()["jobData"]["continue"]) continue;
         currentJob = wQueue.getLatestWork();
 
 
@@ -1257,14 +1297,15 @@ private:
 
             currentJob["jobData"]["workData"] = jobHeader;
             hashCount = 0;
-
             break;
           }
           case randomXAlgo: {
             hashCount = 0;
+            break;
           }
         };
       }
+      //log.print(log.DEBUG, log.MINER_THREAD, lTI, "Mining...");
       currentJob["jobData"]["currentNonce"] = hashCount;
 
       string hashedString;
@@ -1309,6 +1350,16 @@ private:
       hashCount++;
     }
     log.print(log.DEBUG, log.MINER_THREAD, lTI, "Shuting Down!");
+    string hashedString;
+      switch(miningAlgorithm){
+        case randomXAlgo: {
+          log.print(log.DEBUG, log.MINER_THREAD, lTI, "Shuting Down RandomX VM!");
+          randomx_destroy_vm(vm);
+          randomx_release_dataset(dataset);
+          break;
+        }
+      };
+    
     isAllThreadsShutdown += 1;
   }
   int threadCount = 0;
