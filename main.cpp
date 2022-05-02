@@ -1170,29 +1170,20 @@ private:
     //vector<uint8_t> myVector(header.begin(), header.end());
     //uint8_t *un8hash = &myVector[0];
 
-    if(rxIT==0){
-      randomx_calculate_hash_first(vm, &header, header.length());
-      rxIT++;
-    }
+    if(miningEnd) rxIT = 2;
 
     char hash[RANDOMX_HASH_SIZE];
 
-    //char *hash;
-    //randomx_calculate_hash(vm, &headerc, sizeof(headerc), hash);                 // Error is happing here
-    //log.print(log.DEBUG, log.MINER_THREAD_HASH, lTI, "Hash: "+string(hash));
-
-    //while(hash == nullptr){
-    //  log.print(log.DEBUG, log.MINER_THREAD_HASH, lTI, "RandomX Hash is null, retrying...");
-      //randomx_calculate_hash(vm, header.c_str(), header.length(), &hash); 
-    //}
-
-    randomx_calculate_hash_next(vm, &header, header.length(), &hash);
-
-    // if last
-    if(rxIT==3){
+    if(rxIT==0){
+      randomx_calculate_hash_first(vm, &header, header.length());
+      rxIT++;
+    } else if(rxIT==1){
+      randomx_calculate_hash_next(vm, &header, header.length(), &hash);
+      //rxIT++;
+    } else if(rxIT==2){
       randomx_calculate_hash_last(vm, &hash);
+      //rxIT=0;
     }
-
     //string resultingHashedString;
     //cout << "\nHash: ";
     stringstream ss("", ios_base::ate | ios_base::app | ios_base::out);
@@ -1355,6 +1346,7 @@ private:
       switch(miningAlgorithm){
         case randomXAlgo: {
           log.print(log.DEBUG, log.MINER_THREAD, lTI, "Shuting Down RandomX VM!");
+          doRandomX(log, lTI, vm, currentJob);
           randomx_destroy_vm(vm);
           //randomx_release_dataset(dataset);
           break;
