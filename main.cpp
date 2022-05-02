@@ -1194,15 +1194,16 @@ private:
     }
 
     //string resultingHashedString;
-    cout << "\n";
+    //cout << "\nHash: ";
+    stringstream ss("", ios_base::ate | ios_base::app | ios_base::out);
     for(int i = 0; i < RANDOMX_HASH_SIZE; ++i){
-      std::cout << std::hex << std::setw(2) << std::setfill('0') << ((int)hash[i] & 0xff);
+      ss << std::hex << ((int)hash[i] & 0xff);
     }
-    cout << "\n\n";
+    //cout << "\n\n";
 
     //log.print(log.DEBUG, log.MINER_THREAD_HASH, lTI, "hashString");
 
-    return string(hash);
+    return ss.str();
   }
 
   // thread function for the actull mining
@@ -1355,7 +1356,7 @@ private:
         case randomXAlgo: {
           log.print(log.DEBUG, log.MINER_THREAD, lTI, "Shuting Down RandomX VM!");
           randomx_destroy_vm(vm);
-          randomx_release_dataset(dataset);
+          //randomx_release_dataset(dataset);
           break;
         }
       };
