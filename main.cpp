@@ -19,8 +19,8 @@
 #include <atomic>
 #include <memory>
 
-#include "json.hpp"
-#include "sha256.h"
+#include "bLibs/json/single_include/nlohmann/json.hpp"
+#include "bLibs/hash-library/sha256.h"
 #include "bLibs/RandomX/src/randomx.h"
 
 using namespace std;
