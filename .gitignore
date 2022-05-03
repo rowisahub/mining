@@ -1,5 +1,3 @@
-bLibs/*
-bLibs/
 main
 main.o
 main.cpp.sha1
@@ -7,3 +5,4 @@ logs/*
 bLibs/RandomX/build
 .workingDir/
 logs/
+sha256.o
