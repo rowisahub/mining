@@ -1,3 +1,9 @@
 [submodule "bLibs/RandomX"]
 	path = bLibs/RandomX
 	url = https://github.com/tevador/RandomX
+[submodule "bLibs/hash-library"]
+	path = bLibs/hash-library
+	url = https://github.com/stbrumme/hash-library
+[submodule "bLibs/json"]
+	path = bLibs/json
+	url = https://github.com/nlohmann/json
