@@ -1,0 +1,3 @@
+[submodule "bLibs/RandomX"]
+	path = bLibs/RandomX
+	url = https://github.com/tevador/RandomX
