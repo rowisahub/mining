@@ -2,7 +2,7 @@ main
 main.o
 main.cpp.sha1
 logs/*
-bLibs/RandomX/build
+bLibs/RandomX/
 .workingDir/
 logs/
 sha256.o
