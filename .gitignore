@@ -1,8 +1,7 @@
 main
-main.o
 main.cpp.sha1
 logs/*
 .workingDir/
 logs/
-sha256.o
 rem
+*.o
