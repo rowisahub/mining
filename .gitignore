@@ -6,3 +6,4 @@ bLibs/RandomX/build
 .workingDir/
 logs/
 sha256.o
+rem
