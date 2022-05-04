@@ -1,6 +1,6 @@
 CXX = clang++-14
 override CXXFLAGS += -g -Wno-everything
-override CXXPOSTF += -pthread bLibs/RandomX/build/librandomx.a
+override CXXPOSTF += -pthread bLibs/builds/RandomX/librandomx.a
 
 SRCS = $(shell find . -type d \( -path ./bLibs/RandomX -o -name '.ccls-cache' \) -prune -o -type f -name '*.cpp' -print)
 OBJS = $(patsubst %.cpp, %.o, $(SRCS))

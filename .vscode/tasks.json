@@ -3,7 +3,7 @@
         {
             "label": "clearOldMainIfOldAndMake",
             "type": "shell",
-            "command": "if [ -f \"main.cpp\" ]; then if [ ! -d \"$PWD/.workingDir\" ]; then mkdir \"$PWD/.workingDir\"; fi; if [ ! -f \"$PWD/.workingDir/main.cpp.sha1\" ]; then sha1sum main.cpp > \"$PWD/.workingDir/main.cpp.sha1\"; make; else if [ \"$(cat \"$PWD/.workingDir/main.cpp.sha1\")\" != \"$(sha1sum main.cpp)\" ]; then if [ -f \"main\" ]; then rm main; fi; if [ -f \"main.o\" ]; then rm main.o; fi; sha1sum main.cpp > \"$PWD/.workingDir/main.cpp.sha1\"; make; fi; fi; fi;"
+            "command": "if [ -f \"main.cpp\" ]; then if [ ! -d \"$PWD/bLibs/builds\" ]; then mkdir \"$PWD/bLibs/builds\"; fi; if [ ! -f \"$PWD/bLibs/builds/RandomX/librandomx.a\" ]; then if [ ! -d \"$PWD/bLibs/builds/RandomX\" ]; then mkdir \"$PWD/bLibs/builds/RandomX\"; fi; cd \"$PWD/bLibs/builds/RandomX\"; cmake -DARCH=native ../../RandomX; make; cd \"$PWD\"; fi; if [ ! -d \"$PWD/.workingDir\" ]; then mkdir \"$PWD/.workingDir\"; chmod 777 -R .workingDir/; echo \"Created './workingDir'\"; fi; if [ ! -f \"$PWD/.workingDir/main.cpp.sha1\" ]; then echo \"INIT\" > \"$PWD/.workingDir/main.cpp.sha1\"; fi; if [ \"$(cat $PWD/.workingDir/main.cpp.sha1)\" != \"$(sha1sum main.cpp)\" ]; then if [ -f \"main\" ]; then rm main; fi; make; if [ ! -f \"$PWD/main\" ]; then echo \"A error accord when compiling, stoping build script...\"; exit 1; fi; sha1sum main.cpp > \"$PWD/.workingDir/main.cpp.sha1\"; fi; fi;"
         }
     ],
     "version": "2.0.0"
